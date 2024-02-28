@@ -10,7 +10,7 @@ type CustomCheckboxProps = {
   checked: boolean;
   onChange: () => void;
   label: string;
-  numberKey?: string | number;
+  numberKey?: number;
 };
 
 const dataCountries: Country[] = [
@@ -41,19 +41,21 @@ const App: React.FC = () => {
   }, [selectedCountries, countries]);
 
   const toggleCountry = (id: number) => {
-    const updatedSelectedCountries = selectedCountries.includes(id)
-      ? selectedCountries.filter((countryId) => countryId !== id)
-      : [...selectedCountries, id];
-    setSelectedCountries(updatedSelectedCountries);
+    const isSelected = selectedCountries.includes(id);
+    if (isSelected)
+      setSelectedCountries(
+        selectedCountries.filter((countryId) => countryId !== id)
+      );
+    else setSelectedCountries([...selectedCountries, id]);
     setSelectAll(false);
   };
 
   const toggleSelectAll = () => {
     const newSelectAll = !selectAll;
-    const updatedSelectedCountries = newSelectAll
-      ? countries.map((country) => country.id)
-      : [];
-    setSelectedCountries(updatedSelectedCountries);
+    if (newSelectAll) {
+      const countryIds = countries.map((country) => country.id);
+      setSelectedCountries(countryIds);
+    } else setSelectedCountries([]);
     setSelectAll(newSelectAll);
   };
 
@@ -79,7 +81,7 @@ const App: React.FC = () => {
           checked={selectAll}
           label="Select All"
         />
-        {countries.map((country: Country, i: number) => (
+        {countries.map((country: Country) => (
           <CustomCheckbox
             key={country.id}
             checked={selectedCountries.includes(country.id)}
